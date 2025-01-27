@@ -6,6 +6,9 @@ const store = createStore({
     meals: []
   },
   mutations: {
+    SET_USER(state, user) {
+      state.user = user;
+    },
     SET_PATIENTS(state, patients) {
       state.patients = patients;
     },

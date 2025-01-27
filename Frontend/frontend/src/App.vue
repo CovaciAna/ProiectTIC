@@ -1,9 +1,5 @@
 <template>
   <div>
-    <nav>
-      <router-link to="/patients">Pacienti</router-link> |
-      <router-link to="/meals">Mese</router-link>
-    </nav>
     <router-view></router-view>
   </div>
 </template>
