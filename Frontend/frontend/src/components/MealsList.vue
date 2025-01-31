@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Lista mese</h1>
+    <h1>Lista meniuri</h1>
     <ul>
       <li v-for="meal in meals" :key="meal.id">
         {{ meal.time }} - {{ meal.items.join(', ') }} (Pacient: {{ meal.assignedTo }})

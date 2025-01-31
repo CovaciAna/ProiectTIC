@@ -54,13 +54,22 @@ router.put('/:id', authenticate, async (req, res) => {
 });
 
 // Sterge un pacient
-router.delete('/:id',authenticate, async (req, res) => {
+router.delete('/:id', authenticate, async (req, res) => {
     try {
-        await db.collection('patients').doc(req.params.id).delete();
+        const patientId = req.params.id;
+        const patientRef = db.collection('patients').doc(patientId);
+        const patientDoc = await patientRef.get();
+
+        if (!patientDoc.exists) {
+            return res.status(404).json({ message: "Pacientul nu a fost gasit" });
+        }
+
+        await patientRef.delete();
         res.status(200).json({ message: "Pacient sters cu succes" });
     } catch (error) {
-        res.status(500).json({ message: "Eroare la stergere", error });
+        res.status(500).json({ message: "Eroare la stergere", error: error.message });
     }
 });
+
 
 module.exports = router;

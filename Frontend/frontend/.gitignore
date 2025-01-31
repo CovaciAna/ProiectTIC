@@ -1,10 +1,12 @@
 # Node.js dependencies
-node_modules/
+node_modules/git
+
 
 # Firebase config
 firebase.json
 .firebaserc
-frontend/frontend/firebase.js
+Frontend/frontend/src/firebase.js
+
 
 # Build outputs
 /dist

@@ -19,6 +19,7 @@ const mealsRoute = require('./routes/meals');
 // adaugare rute
 app.use('/patients', patientsRoute);
 app.use('/meals', mealsRoute);
+app.use('/api/patients', patientsRoute);
 
 
 app.listen(port, () => {
