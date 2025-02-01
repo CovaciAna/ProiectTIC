@@ -5,36 +5,60 @@
     <div class="menu">
       <router-link to="/patients" class="card">👨‍⚕️ Lista Pacienți</router-link>
       <router-link to="/meals" class="card">🍽 Lista Meniuri</router-link>
-      <router-link to="/patients-meals" class="card">📋 Pacienți / Meniuri</router-link>
-      <button @click="handleLogout" class="logout">🚪 Logout</button>
+      <router-link to="/assignmeals" class="card">📋 Pacienți / Meniuri</router-link>
+      <button @click="showLogoutConfirmation" class="logout">🚪 Logout</button>
+        </div>
     </div>
-  </div>
+   <MessageBox 
+      v-if="showMessageBox" 
+      :message="'Sigur vrei să te deloghezi?'" 
+      type="question" 
+      @confirmed="handleLogout"
+      @canceled="showMessageBox = false"
+    />
 </template>
 
 <script>
+import MessageBox from "./MessageBox.vue";
 import { mapActions } from 'vuex';
+
 
 export default {
   name: 'HomePage',
+  components: { MessageBox },
+  data() {
+    return {
+      showMessageBox: false
+    };
+  },
   methods: {
-    ...mapActions(['logout']),
-    async handleLogout() {
+    ...mapActions(['logout']), 
+     showLogoutConfirmation() {
+      this.showMessageBox = true;
+    },
+    async handleLogout() {  
       await this.logout(); 
-      this.$router.push('/auth'); 
+      this.showMessageBox = false;
+      this.$router.push('/auth');  
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
 .home-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
   text-align: center;
-  margin: 20px;
 }
 
-/* 🔹 Titlu stilizat fără animații */
 .title {
-  font-size: 48px;
+  font-size: 2.5rem;
   font-weight: bold;
   text-transform: uppercase;
   background: linear-gradient(45deg, #42b983, #2c3e50);
@@ -47,43 +71,40 @@ export default {
 .menu {
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
   gap: 20px;
-  height: 80vh;
-  justify-content: center;
+  margin-top: 20px;
 }
 
 .card, .logout {
-  width: 80%;
-  max-width: 600px;
-  padding: 30px;
-  border-radius: 15px;
-  font-size: 24px;
+  width: 100%;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 1.25rem;
   font-weight: bold;
   text-align: center;
   text-decoration: none;
-  color: white;
+  color: #fff;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* 🔹 Efect hover pentru carduri */
 .card {
-  background: #42b983;
+  background: linear-gradient(45deg, #42b983, #2c3e50);
 }
 
 .card:hover {
-  background: #369d72;
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .logout {
-  background: red;
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
   border: none;
 }
 
 .logout:hover {
-  background: darkred;
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 </style>

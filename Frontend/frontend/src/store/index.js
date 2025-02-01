@@ -42,9 +42,17 @@ const store = createStore({
   },
   ADD_PATIENT(state, newPatient) {
     state.patients.push({ ...newPatient, editing: false });
-  }
-   
   },
+  ADD_MEAL(state, newMeal) {
+    state.meals.push(newMeal);
+},
+UPDATE_MEAL(state, updatedMeal) {
+  const index = state.meals.findIndex(meal => meal.id === updatedMeal.id);
+  if (index !== -1) {
+      state.meals[index] = updatedMeal; 
+  }
+},
+},
   actions: {
     async fetchPatients({ commit }) {
       try {
@@ -54,7 +62,6 @@ const store = createStore({
           ...patient,
           editing: false
         }));
-
         commit('SET_PATIENTS', patientsWithEditing);
       } catch (error) {
         console.error('Eroare la preluarea pacienților:', error);
@@ -88,15 +95,6 @@ const store = createStore({
       }
     }
     ,
-    async fetchMeals({ commit }) {
-      try {
-        const response = await fetch('http://localhost:3000/meals');
-        const data = await response.json();
-        commit('SET_MEALS', data);
-      } catch (error) {
-        console.error('Eroare la preluarea meselor:', error);
-      }
-    },
     async deletePatientAPI({ commit, state }, patientId) {
       if (!state.user || !state.user.token) {
           console.error("Token lipsa! Utilizatorul nu este autentificat.");
@@ -154,11 +152,105 @@ const store = createStore({
     }
   }
 ,
+async addMealAPI({ commit, state }, newMeal) {
+  if (!state.user || !state.user.token) {
+      console.error("Token lipsa! Utilizatorul nu este autentificat.");
+      return;
+  }
+
+  try {
+      const response = await fetch('http://localhost:3000/meals', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.user.token}`
+          },
+          body: JSON.stringify(newMeal)
+      });
+
+      if (!response.ok) {
+          throw new Error(`Eroare la adăugare: ${response.status}`);
+      }
+
+      const addedMeal = await response.json();
+
+      commit('ADD_MEAL', addedMeal);
+  } catch (error) {
+      console.error("Eroare la adaugare:", error);
+  }
+}
+,
+async fetchMealsAPI({ commit }) {
+  try {
+    const response = await fetch("http://localhost:3000/meals"); 
+    if (!response.ok) {
+      throw new Error(`Eroare HTTP: ${response.status}`); 
+    }
+    const data = await response.json();
+    commit("SET_MEALS", Array.isArray(data) ? data : []);
+    return data;  
+  } catch (error) {
+    console.error("Eroare la preluarea meniurilor:", error);
+    commit("SET_MEALS", []); 
+    return [];  
+  }
+}
+,
+async fetchMeals({ commit }) {
+  try {
+    const response = await fetch("http://localhost:3000/meals"); 
+
+    if (!response.ok) {
+      throw new Error(`Eroare HTTP: ${response.status}`); 
+    }
+
+    const data = await response.json();
+    commit("SET_MEALS", Array.isArray(data) ? data : []);
+  } catch (error) {
+    console.error("Eroare la preluarea meniurilor:", error);
+    commit("SET_MEALS", []); 
+  }
+},
+async updateMealAPI({ commit, state }, updatedMeal) {
+  if (!updatedMeal.id) {
+      console.error("Eroare: ID-ul meniului lipseste!"); 
+      return;
+  }
+
+  if (!state.user || !state.user.token) {
+      console.error("Token lipsa! Utilizatorul nu este autentificat.");
+      return;
+  }
+
+  try {
+      const response = await fetch(`http://localhost:3000/meals/${updatedMeal.id}`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.user.token}`
+          },
+          body: JSON.stringify(updatedMeal)
+      });
+
+      if (!response.ok) {
+          throw new Error("Eroare la actualizarea meniului.");
+      }
+
+      const updatedMealFromServer = await response.json();
+      console.log("Meniu actualizat cu succes:", updatedMealFromServer);
+      commit("UPDATE_MEAL", updatedMealFromServer);
+  } catch (error) {
+      console.error("Eroare la actualizare:", error);
+  }
+}
+,
+
     logout({ commit }) {
       commit('SET_USER', null);
       commit('SET_AUTH', false);
     }
   }
-});
+}
+);
 
 export default store;

@@ -22,6 +22,7 @@ app.use('/meals', mealsRoute);
 app.use('/api/patients', patientsRoute);
 
 
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}!`);
 });

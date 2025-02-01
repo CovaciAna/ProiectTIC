@@ -4,6 +4,20 @@ const db = require('../dbconfig/dbInit');
 
 const authenticate = require('../middleware/auth');
 
+// Validare date pacient
+const validatePatient = (patient) => {
+    if (!patient.name || typeof patient.name !== 'string' || patient.name.trim() === '') {
+        return "Numele este obligatoriu.";
+    }
+    if (!patient.age || typeof patient.age !== 'number' || patient.age <= 0) {
+        return "Varsta este obligatorie si trebuie sa fie un numar pozitiv.";
+    }
+    if (!patient.diagnosis || typeof patient.diagnosis !== 'string' || patient.diagnosis.trim() === '') {
+        return "Diagnosticul este obligatoriu.";
+    }
+    return null;
+};
+
 // Obtine toti pacientii
 router.get('/', async (req, res) => {
     try {
@@ -34,6 +48,10 @@ router.get('/:id', async (req, res) => {
 // Adauga un nou pacient
 router.post('/', authenticate,  async (req, res) => {
     try {
+        const validationError = validatePatient(req.body);
+        if (validationError) {
+            return res.status(400).json({ message: validationError });
+        }
         const newPatient = req.body;
         const patientRef = await db.collection('patients').add(newPatient);
         res.status(201).json({ id: patientRef.id, ...newPatient });
