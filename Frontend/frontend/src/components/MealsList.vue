@@ -23,7 +23,7 @@
       </div>
       <div class="form-group">
         <label>Calorii:</label>
-        <input v-model.number="newMeal.calories" @blur="validateCalories" placeholder="Calorii" type="number" />
+        <input :value="totalCalories()" disabled />
         <span v-if="errors.calories" class="error-message">{{ errors.calories }}</span>
       </div>
 
@@ -150,6 +150,11 @@ export default {
     generateRandomId() {
     return '_' + Math.random().toString(36).substr(2, 9);
   },
+  totalCalories() {
+    return Object.values(this.newMeal.daily_meals).reduce((total, mealSection) => {
+      return total + mealSection.items.reduce((subTotal, item) => subTotal + (item.calories || 0), 0);
+    }, 0);
+  },
     async fetchMeals() {
       try {
         const data = await this.fetchMealsAPI();
@@ -166,27 +171,28 @@ export default {
       }
     },
     async addOrUpdateMeal() {
-  const isValid = this.validateForm(); 
-  if (!isValid) {
-    console.error("Validarea a eșuat. Meniul nu va fi trimis.");
-    return; 
-  }
+      const isValid = this.validateForm(); 
+      if (!isValid) {
+        console.error("Validarea a eșuat. Meniul nu va fi trimis.");
+        return; 
+      }
 
-  if (!this.isEditing) {
-    this.newMeal.id = this.generateRandomId();
-  }
+      this.newMeal.calories = this.totalCalories();
+      if (!this.isEditing) {
+        this.newMeal.id = this.generateRandomId();
+      }
 
-  try {
-    if (this.isEditing) {
-      await this.updateMealAPI(this.newMeal);
-    } else {
-      await this.addMealAPI(this.newMeal);
-    }
-    this.resetForm();
-    this.fetchMeals();
-  } catch (error) {
-    console.error("Eroare la salvarea meniului:", error);
-  }
+      try {
+        if (this.isEditing) {
+          await this.updateMealAPI(this.newMeal);
+        } else {
+          await this.addMealAPI(this.newMeal);
+        }
+        this.resetForm();
+        this.fetchMeals();
+      } catch (error) {
+        console.error("Eroare la salvarea meniului:", error);
+      }
 },
     editMeal(meal) {
       if (!meal) {
@@ -240,16 +246,11 @@ validateDescription() {
   this.errors.description = this.newMeal.description.trim().length >= 10 ? '' : 'Descrierea trebuie să aibă cel puțin 10 caractere.';
 },
 
-validateCalories() {
-  this.errors.calories = this.newMeal.calories > 0 ? '' : 'Caloriile trebuie să fie un număr pozitiv.';
-},
-
 validateForm() {
   this.validateName();
   this.validateDescription();
-  this.validateCalories();
 
-  return !this.errors.name && !this.errors.description && !this.errors.calories;
+  return !this.errors.name && !this.errors.description;
 }
 
   }
@@ -353,6 +354,7 @@ select {
   border: 2px solid #ddd;
   border-radius: 8px;
   transition: border 0.3s, box-shadow 0.3s;
+   font-family: 'Roboto', sans-serif;
 }
 input:focus,
 textarea:focus,
@@ -364,6 +366,7 @@ select:focus {
 textarea {
   min-height: 100px;
   resize: vertical;
+  font-family: 'Roboto', sans-serif;
 }
 
 .form-grid {

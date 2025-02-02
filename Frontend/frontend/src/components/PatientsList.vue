@@ -103,7 +103,6 @@
         </tr>
       </tbody>
     </table>
-
     <div class="pagination">
       <button
         @click="handlePageChange(currentPage - 1)"
@@ -130,7 +129,6 @@
 import { mapState, mapActions } from 'vuex';
 import { nextTick } from 'vue';
 import MessageBox from './MessageBox.vue';
-
 
 export default {
   name: 'PatientsList',
@@ -173,7 +171,7 @@ export default {
   methods: {
     ...mapActions(['fetchPatients', 'updatePatientAPI', 'deletePatientAPI', 'addPatientAPI']),
 
-confirmDelete(patientId) {
+    confirmDelete(patientId) {
       this.patientToDelete = patientId;
       this.showMessageBox = true;
     },
@@ -189,7 +187,7 @@ confirmDelete(patientId) {
       this.showAddPatientForm = !this.showAddPatientForm;
     },
 
-    async addPatient() {
+  async addPatient() {
   if (!this.validateForm()) {
     console.error("Validarea a esuat. Pacientul nu va fi trimis.");
     return;
