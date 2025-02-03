@@ -39,7 +39,6 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th>
           <th>Nume</th>
           <th>Adresă</th>
           <th>Data admiterii</th>
@@ -52,7 +51,6 @@
       </thead>
       <tbody>
         <tr v-for="patient in paginatedPatients" :key="patient.id">
-          <td>{{ patient.id }}</td>
           <td>{{ patient.name }}</td>
           <td>
             {{ patient.address.city }}, {{ patient.address.country }}, {{ patient.address.street }}
